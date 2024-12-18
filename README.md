@@ -35,6 +35,15 @@ $\boxed{\text{Chain-of-Embedding (CoE)}}$ is a brand-new interpretability tool, 
 
 We provide automated scripts in this repository to help you obtain inference-time **CoE scores** and **Visualization** of each sample.
 
+## Environment Installation
+
+```sh
+conda create -n coeeval python=3.10
+conda activate coeeval
+pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+```
+
 ## Preparation
 
 
