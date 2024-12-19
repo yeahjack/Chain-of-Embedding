@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export PROJECT_PATH="/mnt/nas/users/jiangchuan.wym/chain-of-embedding"
-export CUDA_VISIBLE_DEVICES="2,3"
+export PROJECT_PATH="/your/path/to/Chain-of-Embedding"
+export CUDA_VISIBLE_DEVICES="0,1"
 
 model_name="qwen2-7B-Instruct"
-
 dataset_list=(mgsm)
+
 for i in ${dataset_list[*]}; do
     python main.py --model_name $model_name \
                         --dataset "$i" \
