@@ -1,34 +1,22 @@
+import argparse
 import os
 import sys
-import time
-import math
-import json
-import random
-import argparse
-from tqdm import tqdm
 
-import numpy as np
-import pickle
-import scipy.spatial
 import torch
-import torch.nn as nn
-
 from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    AutoConfig,
     GenerationConfig,
 )
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'device: {device}')
 
 project_root_path = os.environ["PROJECT_PATH"]
 sys.path.append(project_root_path)
+from config_pool import DATASET_POOL, LANGUAGE_MAPPING, MODEL_POOL
 from Data.load_data import DatasetInfo
-from Model.load_model import load_base_model
-from config_pool import MODEL_POOL, DATASET_POOL, LANGUAGE_MAPPING
 from inference import Inference
+from Model.load_model import load_base_model
 
 
 if __name__ == '__main__':
@@ -43,7 +31,7 @@ if __name__ == '__main__':
     parser.add_argument("--save_hidden_states", action="store_true")
     parser.add_argument("--save_coe_score", action="store_true")
     parser.add_argument("--save_coe_figure", action="store_true")
-    
+
     args = parser.parse_args()
     args.max_output_token = 2048 if "Instruct" in args.model_name else 128
 
@@ -80,4 +68,3 @@ if __name__ == '__main__':
         dataset_info["language"] = lang
         Infer = Inference(model_info, dataset_info, verbose)
         Infer.dataset_inference()
-    

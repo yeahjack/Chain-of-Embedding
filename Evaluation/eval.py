@@ -1,17 +1,18 @@
-import os
-import sys
-import re
-import pickle
 import argparse
+import os
+import pickle
+import sys
 
-from sklearn.metrics import roc_curve, auc, precision_recall_curve
 from scipy import interpolate
+from sklearn.metrics import auc, precision_recall_curve, roc_curve
+
 
 project_root_path = os.environ["PROJECT_PATH"]
 sys.path.append(project_root_path)
-from Data.load_data import DatasetInfo
-from config_pool import MODEL_POOL, DATASET_POOL, LANGUAGE_MAPPING
 from match import AnswerParsing
+
+from config_pool import DATASET_POOL, MODEL_POOL
+from Data.load_data import DatasetInfo
 
 
 class StandardEvaluation:
@@ -27,7 +28,7 @@ class StandardEvaluation:
         answerparsing = AnswerParsing(args.dataset)
         output_dir = os.path.join(project_root_path, f"OutputInfo/{args.language}/Output", args.model_name, args.dataset)
         coe_dir = os.path.join(project_root_path, f"OutputInfo/{args.language}/CoE", args.model_name, args.dataset)
-        
+
         output_list, coe_list, binary_list = [], [], []
         acc = 0
         for i in range(self.data_size):

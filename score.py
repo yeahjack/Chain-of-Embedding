@@ -1,17 +1,11 @@
-import os
-import sys
-import time
 
-import scipy.spatial
-from scipy.stats import entropy
 import math
-import json
 
-from torch.utils.dlpack import to_dlpack
-from torch.utils.dlpack import from_dlpack
+import numpy as np
 import torch
 import torch.nn.functional as F
-import numpy as np
+from scipy.stats import entropy
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -82,7 +76,7 @@ class CoEScoreInfo:
         al_semdiff_norm = np.array(al_semdiff)
         al_semdiff_ave = np.mean(np.array(al_semdiff_norm))
         al_semdiff_var = np.var(np.array(al_semdiff_norm))
-        
+
         return al_semdiff_norm, al_semdiff_ave, al_semdiff_var
 
     def compute_CoE_R(self):
@@ -98,7 +92,7 @@ class CoEScoreInfo:
         y_list = np.array([al_repdiff_norm[i] * math.sin(al_semdiff_norm[i]) for i in range(len(al_semdiff_norm))])
         al_combdiff_x_ave = np.mean(x_list)
         al_combdiff_y_ave = np.mean(y_list)
-        al_combdiff_x_var = np.mean(x_list)
-        al_combdiff_y_var = np.mean(y_list)
+        #al_combdiff_x_var = np.mean(x_list)
+        #al_combdiff_y_var = np.mean(y_list)
 
         return math.sqrt(al_combdiff_x_ave ** 2 + al_combdiff_y_ave ** 2)

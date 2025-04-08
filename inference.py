@@ -1,38 +1,21 @@
 import os
+import pickle
 import sys
 import time
-import random
 
-import pickle
-import argparse
-import scipy.spatial
-import math
-import json
-import torch
-import torch.nn as nn
-
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-from matplotlib.colors import Normalize
-import seaborn as sns
-from collections import Counter
-
 import numpy as np
-import pickle
+import torch
+from sklearn.decomposition import PCA
 from tqdm import tqdm
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    AutoConfig,
-    GenerationConfig,
-)
+
 
 project_root_path = os.environ["PROJECT_PATH"]
 sys.path.append(project_root_path)
 from Data.load_data import DatasetInfo
 from prompt_pool import *
-from score import OutputScoreInfo, CoEScoreInfo
+from score import CoEScoreInfo, OutputScoreInfo
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -49,7 +32,7 @@ class Inference:
         self.generation_config = self.model_info["generation_config"]
         self.tokenizer = self.model_info["tokenizer"]
         self.max_output_token = self.model_info["max_output_token"]
-        
+
         self.dataset_name = self.dataset_info["dataset_name"]
         self.data_loader = DatasetInfo(self.dataset_name)
         self.data_all = self.data_loader.data
@@ -61,7 +44,7 @@ class Inference:
 
     def dataset_inference(self):
         self.greedy_inference()
-        
+
 
     def greedy_inference(self):
         for i in tqdm(range(self.data_size)):
@@ -101,7 +84,7 @@ class Inference:
                 if self.verbose["save_hidden_states"]: self.save_hidden_states(hidden_states, i)
 
                 CoE_score = self.print_CoE_score()
-                if self.verbose["save_coe_score"]: self.save_CoE_score(CoE_score, i) 
+                if self.verbose["save_coe_score"]: self.save_CoE_score(CoE_score, i)
                 if self.verbose["save_coe_figure"]: self.save_CoE_figure(hidden_states, i)
 
 
@@ -110,7 +93,7 @@ class Inference:
         self.model.eval()
         terminators = [self.tokenizer.eos_token_id, self.tokenizer.convert_tokens_to_ids("<|eot_id|>")] \
             if "Llama" in self.model_name else self.tokenizer.eos_token_id
-    
+
         time_start = time.time()
         generation_output = self.model.generate(
             input_ids=input_ids.to(device),
@@ -126,7 +109,7 @@ class Inference:
         )
         time_end = time.time()
         print(f'inference time: {round(time_end - time_start, 4)}')
-        
+
         return generation_output
 
 
@@ -137,13 +120,13 @@ class Inference:
         model_input = DATASET_PROMPTS[self.dataset_name].replace("{input_data}", input_data)
         if self.dataset_name == "theoremqa":
             model_input = model_input.replace("{answer_type}", sample["answer_type"])
-        input_ids = self.tokenizer.apply_chat_template([{"role": "user", "content": model_input}], 
+        input_ids = self.tokenizer.apply_chat_template([{"role": "user", "content": model_input}],
                             tokenize=True, add_generation_prompt=True, return_tensors="pt")
         input_len = len(input_ids[0])
 
         print(f"********** Input Text (length: {input_len}) **********\n{input_data}\n")
         print(f"********** Input ID **********\n{input_ids}\n")
-        
+
         return input_data, output_data, model_input, input_ids
 
 
@@ -165,14 +148,14 @@ class Inference:
 
         return output_seq, maxprob, ppl, entropy
 
-    
+
     def save_output(self, output, i):
         filedir = os.path.join(project_root_path, f'OutputInfo/{self.language}/Output', self.model_name, self.dataset_name)
         if not os.path.exists(filedir):
             os.makedirs(filedir)
         with open(os.path.join(filedir, self.dataset_name + '_' + str(i) + '.pkl'), 'wb') as file:
             pickle.dump(output, file)
-    
+
 
     def print_hidden_states(self):
         hidden_states = self.sample_info["output"]["all_token_hidden_states"]
@@ -228,7 +211,7 @@ class Inference:
         if not os.path.exists(filedir):
             os.makedirs(filedir)
         with open(os.path.join(filedir, self.dataset_name + '_' + str(i) + '.pkl'), 'wb') as file:
-            pickle.dump(CoE_score, file)   
+            pickle.dump(CoE_score, file)
 
 
     def save_CoE_figure(self, hidden_states, i):
@@ -247,7 +230,7 @@ class Inference:
 
         ax1.set_xlabel('X-axis', fontsize=24, fontweight='bold')
         ax1.set_ylabel('Y-axis', fontsize=24, fontweight='bold')
-        
+
         '''save'''
         filedir = os.path.join(project_root_path, f'Figure/{self.language}', self.model_name, self.dataset_name)
         if not os.path.exists(filedir):

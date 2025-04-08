@@ -1,23 +1,9 @@
-import os
-import sys
-import time
-import random
 
-import argparse
-import scipy.spatial
-import math
-import json
 import torch
-import torch.nn as nn
-
-import numpy as np
-import pickle
-from tqdm import tqdm
 from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
     AutoConfig,
-    GenerationConfig,
+    AutoModelForCausalLM,
+    AutoTokenizer,
 )
 
 

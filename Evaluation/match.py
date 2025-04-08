@@ -1,4 +1,5 @@
 import re
+
 from prompt_pool import ANSWER_PREFIX
 
 
@@ -21,7 +22,7 @@ class AnswerParsing:
             extracted_answer, binary = self.belebele_parse(pred, true)
 
         return extracted_answer, binary
-        
+
 
     def extract_boxed_content(self, text):
         pattern = re.compile(r'\\boxed{')
@@ -84,7 +85,7 @@ class AnswerParsing:
         pred = pred.replace(")", "")
         match = re.search(ANSWER_PATTERN_MULTICHOICE, pred)
         extracted_answer = match.group(1) if match else None
-            
+
         return extracted_answer, true == extracted_answer
 
 
@@ -98,7 +99,7 @@ class AnswerParsing:
         pred = pred.replace(")", "")
         match = re.search(ANSWER_PATTERN_MULTICHOICE, pred)
         extracted_answer = match.group(1) if match else None
-        
+
         return extracted_answer, true == extracted_answer
 
 
@@ -135,11 +136,11 @@ class AnswerParsing:
             extracted_answer = numbers[-1].rstrip(".") if numbers else ""
         elif answer_type == "list of integer" or answer_type == "list of float":
             match = re.search(r"\[(.*?)\]",  pred)
-            extracted_answer = match.group(1) if match else None  
+            extracted_answer = match.group(1) if match else None
             true = true[1:-1]
         elif answer_type == "option":
             match = re.search(r"\(([a-d])\)", pred)
             extracted_answer = match.group(1) if match else None
             true = true[1:-1]
-        
+
         return extracted_answer, true == extracted_answer
